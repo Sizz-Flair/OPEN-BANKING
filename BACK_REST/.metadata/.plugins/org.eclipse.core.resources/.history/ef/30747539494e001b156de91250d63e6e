@@ -1,0 +1,247 @@
+package com.bank.admin.system;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.bank.admin.system.model.accountUpdateInfoDto;
+import com.bank.core.BankManagement;
+
+/**
+ * <pre>
+ * AuthTestController.java : controller Description 작성
+ * ====================================================================
+ * Function Description                               ( Writer / Date )
+ * ====================================================================
+ * - GET OPENBAKING TEST CODE                      (김현진/2020. 11. 22.)
+ * ====================================================================
+ * Edit Description                                   ( Writer / Date )
+ * ====================================================================
+ * -
+ * </pre>
+ */
+@RestController
+public class AuthTestController {
+
+	private static final Logger logger = LoggerFactory.getLogger(AuthTestController.class);
+
+	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+	Date dTime = new Date();
+
+	BankManagement bankManagement = new BankManagement();
+
+	@PostMapping(value = "/tokenRequest")
+	public HashMap<String, String> authCodeRequest(@RequestParam String code, HttpServletResponse res)
+			throws IOException {
+		/* Test를 위한 토큰 하드코딩 */
+		Cookie token = new Cookie("ACCESS_TOKEN",
+				"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIxMTAwNzU5OTA1Iiwic2NvcGUiOlsiaW5xdWlyeSIsImxvZ2luIiwidHJhbnNmZXIiXSwiaXNzIjoiaHR0cHM6Ly93d3cub3BlbmJhbmtpbmcub3Iua3IiLCJleHAiOjE2MTU0NDg1NDgsImp0aSI6IjMyMTg2MmM1LTAwNTYtNGNkMy1iNGQ2LTM0NTZkZmQ1YjEyMyJ9.OzmYxvLQBaH_Ch2NZolxyfnfvmsh5ANEGfBOCqUvZco");
+		Cookie refreshToken = new Cookie("REFRESH_TOKEN",
+				"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiIxMTAwNzU5OTA1Iiwic2NvcGUiOlsiaW5xdWlyeSIsImxvZ2luIiwidHJhbnNmZXIiXSwiaXNzIjoiaHR0cHM6Ly93d3cub3BlbmJhbmtpbmcub3Iua3IiLCJleHAiOjE2MTQ4MzYxNDgsImp0aSI6IjdhZDkzMDQ2LThiZjAtNDA3Ni1iMDNhLWRiM2RlNGI5YTU1OCJ9.63bCIX_--gQHjcB3KrStyhEDRJC2dd7yKfwWcZJz2XA");
+		Cookie userSeqNum = new Cookie("USER_SEQ_NO", "1100759905");
+
+		token.setPath("/");
+		token.setMaxAge(7 * 24 * 60 * 60);
+
+		refreshToken.setPath("/");
+		refreshToken.setMaxAge(7 * 24 * 60 * 60);
+
+		userSeqNum.setPath("/");
+		userSeqNum.setMaxAge(7 * 24 * 60 * 60);
+
+		res.addCookie(token);
+		res.addCookie(refreshToken);
+		res.addCookie(userSeqNum);
+
+		return null;
+	}
+
+	/**
+	 * <pre>
+	 * Function Description                ( Writer / Date )
+	 * =====================================================
+	 * - READ USER INFO LIST             (김현진/2020. 12. 1.)
+	 * =====================================================
+	 * Edit Description                    ( Writer / Date )
+	 * =====================================================
+	 * -
+	 * </pre>
+	 *
+	 * JSONObject
+	 * 
+	 * @param request
+	 * @return
+	 * @throws Exception
+	 */
+	@PostMapping(value = "/index/user")
+	public JSONObject userInfoList(HttpServletRequest request) throws Exception {
+		/* ACCESS_TOKEN 쿠키 검색 */
+		String token = serchCookie("ACCESS_TOKEN", request).getValue();
+
+		JSONObject userInfo = bankManagement.readUserInfoList(token);
+		return userInfo;
+	}
+
+	@PostMapping(value = "/index/account")
+	public ResponseEntity<JSONObject> userAccountInfo(HttpServletRequest request,
+			@RequestParam("fintechNum") String fintechNum) throws Exception {
+
+		/* 변수선언 */
+		String token = serchCookie("ACCESS_TOKEN", request).getValue();
+		HashMap<String, String> param = new HashMap<String, String>();
+		JSONObject readUserAccountInfo = null;
+		String bank_tran_id = CreateUniqNum();
+
+		param.put("bank_tran_id", bank_tran_id); // 은행거래 고유번호
+		param.put("fintech_use_num", fintechNum); // 핀테크 이용 번호
+		param.put("tran_dtime", sdf.format(dTime)); // 요청일시
+
+		readUserAccountInfo = bankManagement.readAccountInfo(token, param);
+
+		return ResponseEntity.ok(readUserAccountInfo);
+	}
+	
+	@PostMapping(value="/index/transation")
+	public ResponseEntity<JSONObject> userTranscationInfo(HttpServletRequest request,
+			@RequestParam HashMap<String, String> param) throws Exception {
+		
+		/* 변수선언 */
+		String token = serchCookie("ACCESS_TOKEN", request).getValue();
+		String bank_tran_id = CreateUniqNum();
+		JSONObject readTranActionInfo = null;
+		
+		HashMap<String, String> transData = new HashMap<String, String>();
+		
+		transData.put("bank_tran_id", bank_tran_id);
+		transData.put("fintech_use_num", param.get("fintech_use_num"));
+		transData.put("inquiry_type", param.get("inquiry_type"));
+		transData.put("inquiry_base", "D");
+		transData.put("from_date", param.get("from_date"));
+		transData.put("from_time", "000000");
+		transData.put("to_date", param.get("to_date"));
+		transData.put("to_time", "000000");
+		transData.put("sort_order", "D");
+		transData.put("tran_dtime",  sdf.format(dTime));		
+		
+		readTranActionInfo = bankManagement.readTranscationInfoList(token, transData);
+		
+		logger.info(readTranActionInfo.toString()+"----------------");
+		
+		return ResponseEntity.ok(readTranActionInfo);	
+	}
+	
+	/**
+	 *<pre>
+	 * Function Description                ( Writer / Date )
+	 * =====================================================
+	 * - 계좌정보 변경                      (김현진/2020. 12. 31.)
+	 * =====================================================
+	 * Edit Description                    ( Writer / Date )
+	 * =====================================================
+	 * -
+	 *</pre>
+	 *
+	 * ResponseEntity<JSONObject>
+	 * @param param(변경할 이름, 핀테크 번호)
+	 * @return
+	 * @throws Exception
+	 */
+	@PostMapping(value="/index/accountupdateinfo")
+	public String updateAccountInfo(
+			HttpServletRequest request,
+			@Valid accountUpdateInfoDto accountUpdateInfoDto, Errors errors) throws Exception {
+		
+		/* 변수 선언 */
+		String token = null;
+		String responseCheck = null;
+		HashMap<String, String> param = null;
+		
+		/* error확인 후 param적재 */
+		if(!errors.hasErrors()) {
+			param.put("fintech_use_num", accountUpdateInfoDto.getFintech_use_num());
+			param.put("account_alias", accountUpdateInfoDto.getAccount_alias());	
+		} else {
+			logger.info("################################");
+			logger.info(errors.getFieldError().toString());
+			logger.info("################################");
+			return "Valid error";
+		}
+		
+		/* 토큰 확인 */
+		token = serchCookie("ACCESS_TOKEN", request).getValue(); //쿠키에서 확인
+
+		/* 계좌정보 변경 */
+		if(token != null) {
+			responseCheck = bankManagement.readAccountUpdateInfo(token, param);	
+		}
+
+		return responseCheck;
+	}
+	@PostMapping(value="/index/transferdiposit")
+	public JSONObject readTransferDeposit(
+			@RequestParam HashMap<String, String> param) throws Exception {
+		
+		logger.info(param.toString());
+		JSONObject json = null;
+		
+		bankManagement.transferDifosit("a", json);
+		
+
+		return null;
+	}
+	
+
+	public Cookie serchCookie(String cookieName, HttpServletRequest request) {
+
+		Cookie[] cookies = request.getCookies();
+		Cookie cookie = null;
+		for (Cookie c : cookies) {
+			if (c.getName().equals(cookieName)) {
+				return c;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 *<pre>
+	 * Function Description                ( Writer / Date )
+	 * =====================================================
+	 * - 은행거래고유번호 생성                   (김현진/2021. 1. 1.)
+	 * =====================================================
+	 * Edit Description                    ( Writer / Date )
+	 * =====================================================
+	 * -
+	 *</pre>
+	 *
+	 * String
+	 * @return
+	 */
+	public String CreateUniqNum() {
+		String grantNum = "T991637660U";
+		int num = 0;
+
+		for (int i = 0; i < 9; i++) {
+			num = (int) (Math.random() * 10);
+			grantNum += Integer.toString(num);
+		}
+		return grantNum;
+	}
+	
+}

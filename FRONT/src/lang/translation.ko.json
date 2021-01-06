@@ -1,0 +1,21 @@
+{
+"LOGIN": "LOGIN",
+
+"MSG_INFO_COMMON_001":"{{n}}을(를) 입력해 주세요",
+"MSG_INFO_COMMON_002":"최소 {{n}}자리 이상 입력 하세요",
+"MSG_INFO_COMMON_003":"최대 {{n}}자리만 입력 가능합니다",
+"MSG_INFO_COMMON_004":"{{n}} 사용 가능 합니다",
+"MSG_INFO_COMMON_005":"{{n}} 양식이 아닙니다",
+
+"LABEL_BANK" : "은행",
+"LABEL_BANK_NAME" : "은행명",
+"LABEL_INQUIRY" : "조회할",
+"LABEL_PRODUCT" : "상품",
+"LABEL_PRODUCT_NAME" : "상품명",
+"LABEL_BALANCE" : "잔액",
+"LABEL_AVAILAB" : "줄금가능금액",
+"LABEL_FINTECH_NUM" : "회차번호",
+"LABEL_BANK_TRAN" : "계좌 설계일",
+"LABEL_MATURITY" : "만기일",
+"LABEL_LAS_TRAN_DATA" : "최종 거래일"
+}

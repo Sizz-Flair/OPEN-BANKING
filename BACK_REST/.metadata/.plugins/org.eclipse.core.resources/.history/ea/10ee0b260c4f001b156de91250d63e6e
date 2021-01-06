@@ -1,0 +1,5 @@
+package com.bank.admin.system.service.impl;
+
+public class BankAuthServiceImpl {
+
+}

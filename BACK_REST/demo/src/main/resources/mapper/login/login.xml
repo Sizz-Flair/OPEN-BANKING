@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bank.admin.system.service.impl.LoginDao">
+	<select id="selectList" parameterType="java.lang.String" resultType="java.lang.String" >
+		SELECT his_date_eng
+		  FROM tmst_com_his_info_eng
+		 WHERE seq_eng = 1
+	</select>
+	
+	<select id="selectValidateLogin" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		SELECT login_id,
+			   login_password,
+			   email,
+			   addres,
+			   name				
+		FROM tco_login
+		WHERE login_id = #{userId}	
+	</select>
+	
+	<select id="loginInfo" parameterType="java.util.HashMap" resultType="java.util.HashMap" >
+		SELECT *
+		FROM tco_admin_login_mngt
+		WHERE admin_login_id = 'operator'
+	</select>
+	
+	<select id="userDetailInfo" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT login_id
+		FROM tco_login
+		WHERE login_id = #{memberId}
+	</select>
+	
+	<insert id="loginIdRegister" parameterType="java.util.HashMap">
+		INSERT INTO tco_login
+			(
+				seq,
+				login_id,
+				login_password,
+				email,
+				addres,
+				name,
+				cellphn_num				
+		) VALUES (
+				SEQ_OP_LOGIN.NEXTVAL,
+				#{memberId},
+				#{memberPassword},
+				#{email},
+				#{addrInfo},
+				#{userName},
+				#{phoneNum}			
+			)
+			<selectKey resultType="String" order="AFTER">
+				SELECT TO_CHAR(SEQ_OP_LOGIN.CURRVAL) FROM DUAL
+			</selectKey>
+	</insert>
+</mapper> 
+
+ 

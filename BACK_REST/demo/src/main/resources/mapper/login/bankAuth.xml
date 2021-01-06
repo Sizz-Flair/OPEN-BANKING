@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bank.admin.system.service.impl.BankAuthDao">
+	<select id="readBankAuthInfo" resultType="java.util.HashMap" >
+		SELECT client_id,
+			   client_secret,
+			   scope,
+			   grant_type
+		  FROM bank_auth
+	</select>
+</mapper> 
+
+ 

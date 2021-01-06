@@ -1,0 +1,28 @@
+
+#jdbc.driver=net.sf.log4jdbc.DriverSpy
+#jdbc.url=jdbc:log4jdbc:oracle:thin:@116.126.87.211:27058/ORCL
+#jdbc.username=C##EMD_USER
+#jdbc.password=EMD2019
+
+
+
+#spring.datasource.driver-class-name=oracle.jdbc.driver.OracleDriver
+#spring.datasource.url = jdbc:oracle:thin:@116.126.87.211:27058/ORCL
+#spring.datasource.username=C##EMD_USER
+#spring.datasource.password=EMD2019
+
+spring.datasource.driver-class-name=oracle.jdbc.driver.OracleDriver
+spring.datasource.url = jdbc:oracle:thin:@localhost:1521/xe
+spring.datasource.username=C##akfur2
+spring.datasource.password=a159
+
+server.servlet.session.timeout=10000000s
+server.servlet.session.cookie.max-age=10000000s
+
+
+
+#mybatis.type-aliases-package=com.bank.admin.system.service.impl
+
+#mybatis.mapper-locations=classpath:mapper/**/*.xml
+
+server.port=8080
