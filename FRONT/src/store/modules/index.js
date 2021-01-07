@@ -4,6 +4,7 @@ import membership from './membership'
 import dashboard from './dashboard';
 import account from './account'
 import transcation from './transcation'
+import transfer from './transfer'
 
 import { reducer as formReducer } from 'redux-form';
 
@@ -15,6 +16,7 @@ export default combineReducers({
   dashboard,
   account,
   transcation,
+  transfer,
   form: formReducer
   // 다른 리듀서를 만들게되면 여기에 넣어줌..
 });

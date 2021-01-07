@@ -376,50 +376,95 @@ public class BankManagement {
 		return responseMessage;
 	}
 	
-	public JSONObject transferDifosit(String token, JSONObject param) throws Exception {
+	/**
+	 *<pre>
+	 * Function Description                ( Writer / Date )
+	 * =====================================================
+	 * - 입금이체(핀테크번호)                   (김현진/2021. 1. 7.)
+	 * =====================================================
+	 * Edit Description                    ( Writer / Date )
+	 * =====================================================
+	 * -
+	 *</pre>
+	 *
+	 * HashMap<String,String>
+	 * @param token
+	 * @param param
+	 * @return
+	 * @throws Exception
+	 */
+	public HashMap<String, Object> transferDifosit(String token, HashMap<String, Object> param) throws Exception {
 		/* 변수선언 */
+		HashMap<String, Object> errorMessage = new HashMap<String, Object>();
+		HashMap<String, Object> readTransferData = null;
+		HashMap<String, String> oobToken = null;
 		Response response = null;
-		JSONObject json1 = new JSONObject();
+		JSONObject jsonObject = new JSONObject();
 		JSONObject res_list = new JSONObject();
 		JSONArray jsonArray = new JSONArray();
-		JSONObject json = null;
-		HashMap<String, String> oobToken = null;
+		ArrayList<HashMap<String, String>> arrayList = new ArrayList<HashMap<String,String>>();
 		String uri = "transfer/deposit/fin_num";
-		res_list.put("tran_no", "1");
-		res_list.put("bank_tran_id", "T991637660U231035225");
-		res_list.put("fintech_use_num", "199163766057884728492112");
-		res_list.put("print_content", "쇼핑몰환불");
-		res_list.put("tran_amt", "500");
-		res_list.put("req_client_name", "홍길동");
-		res_list.put("req_client_bank_code", "097");
-		res_list.put("req_client_account_num", "219999999999");
-		res_list.put("req_client_num", "HONGGILDONG1234");
-		res_list.put("transfer_purpose", "TR");
-		res_list.put("cms_num", "93848103221");
+		
+		res_list.put("tran_no", param.get("tran_no"));
+		res_list.put("bank_tran_id", param.get("bank_tran_id"));
+		res_list.put("fintech_use_num", param.get("fintech_use_num"));
+		res_list.put("print_content", param.get("print_content"));
+		res_list.put("tran_amt", param.get("tran_amt"));
+		res_list.put("req_client_name", param.get("req_client_name"));
+		res_list.put("req_client_bank_code", param.get("req_client_bank_code"));
+		res_list.put("req_client_account_num", param.get("req_client_account_num"));
+		res_list.put("req_client_num", param.get("req_client_num"));
+		res_list.put("transfer_purpose", param.get("transfer_purpose"));
+		res_list.put("cms_num", param.get("cms_num"));
 		
 		jsonArray.add(res_list);
 		
-		
-		json1.put("cntr_account_type", "N");
-		json1.put("cntr_account_num", "1539337380");
-		json1.put("wd_pass_phrase", "NONE");
-		json1.put("wd_print_content", "환불금액");
-		json1.put("name_check_option", "off");
-		json1.put("sub_frnc_name", "하위가맹점");
-		json1.put("sub_frnc_num", "123456789012");
-		json1.put("sub_frnc_business_num", "1234567890");
-		json1.put("tran_dtime", "20200722093752");
-		json1.put("req_cnt", "1");
-		json1.put("req_list", jsonArray);
-		
+		jsonObject.put("cntr_account_type", param.get("cntr_account_type"));
+		jsonObject.put("cntr_account_num", param.get("cntr_account_num"));
+		jsonObject.put("wd_pass_phrase", param.get("wd_pass_phrase"));
+		jsonObject.put("wd_print_content", param.get("wd_print_content"));
+		jsonObject.put("name_check_option", param.get("name_check_option"));
+		jsonObject.put("sub_frnc_name", param.get("sub_frnc_name"));
+		jsonObject.put("sub_frnc_num", param.get("sub_frnc_num"));
+		jsonObject.put("sub_frnc_business_num", param.get("sub_frnc_business_num"));
+		jsonObject.put("tran_dtime", param.get("tran_dtime"));
+		jsonObject.put("req_cnt", param.get("req_cnt"));
+		jsonObject.put("req_list", jsonArray);
+
 		oobToken = oobToken();
 		
-		response = connectPost(json1, oobToken.get("access_token"), uri);
+		response = connectPost(jsonObject, oobToken.get("access_token"), uri);	
+		readTransferData = response.readEntity(HashMap.class);
 		
-		json = response.readEntity(JSONObject.class);
+		arrayList = (ArrayList<HashMap<String, String>>) readTransferData.get("res_list");
 		
-		logger.info("=================="+oobToken.get("access_token"));
-		logger.info(json.toString());
+		for(int i=0; i<arrayList.size(); i++) {
+			arrayList.get(i).put("id", Integer.toString(i));
+		}
+		
+		readTransferData.remove("res_list");
+		readTransferData.put("res_list", arrayList);
+		
+		logger.info(arrayList.toString()+"jjjjjjjjjjjjjjj");
+		logger.info(readTransferData.toString()+"jjjjjjjjjjjjjjj");
+		
+
+		if(response.getStatus() == 200) {
+			try {
+				if(readTransferData.get("rsp_code").equals("A0000")) {
+					return readTransferData;
+				} else {
+					errorMessage.put("errorMessage", 
+							checkResponseMessage(readTransferData.get("rsp_code").toString()));				
+					return errorMessage;		
+				}
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				response.close();
+			}
+		}
 		
 		return null;
 	}
@@ -472,9 +517,9 @@ public class BankManagement {
 		
 		errorMessage.put("errorMessage", Integer.toString(response.getStatus()));
 		
-		return null;
+		return errorMessage;
 	}
-	
+
 	public String checkResponseMessage(String param) throws Exception {
 		
 		String errorMessage = null;

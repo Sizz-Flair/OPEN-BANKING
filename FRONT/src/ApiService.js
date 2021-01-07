@@ -210,6 +210,7 @@ class ApiService {
             withCredentials:true,
             data: qs.stringify(data)
         }).then(res=>{
+            console.log("TransferReqData==========>  ",res.data);
             return res.data;
         })
     }

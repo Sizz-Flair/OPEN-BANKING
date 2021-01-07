@@ -14,6 +14,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,8 +24,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.bank.admin.system.model.accountUpdateInfoDto;
+import com.bank.admin.system.model.transferDepositDto;
 import com.bank.admin.system.service.BankAuthService;
 import com.bank.core.BankManagement;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * <pre>
@@ -217,21 +221,58 @@ public class AuthTestController {
 		return responseCheck;
 	}
 	
+	/**
+	 *<pre>
+	 * Function Description                ( Writer / Date )
+	 * =====================================================
+	 * - 입금이체(핀테크번호)                   (김현진/2021. 1. 7.)
+	 * =====================================================
+	 * Edit Description                    ( Writer / Date )
+	 * =====================================================
+	 * -
+	 *</pre>
+	 *
+	 * JSONObject
+	 * @param param
+	 *  - (약정계좌/계정 구분, 핀테크번호...입금이체 조회에 필요한 정보)
+	 * @return
+	 * @throws Exception
+	 */
 	@PostMapping(value="/index/transferdiposit")
-	public JSONObject readTransferDeposit(
+	public HashMap<String, Object> readTransferDeposit(
 			HttpServletRequest request,
-			@RequestParam HashMap<String, String> param) throws Exception {
+			@Valid transferDepositDto transferDepositDto, Errors errors) throws Exception  {
 		
-		logger.info(param.toString());
+		/* 변수선언 */
 		String token = null;
-		JSONObject json = null;
+		ObjectMapper mapper = new ObjectMapper();
+		HashMap<String, Object> readTransferInfo = new HashMap<String, Object>();
+		HashMap<String, Object> param = null;
 		
-		token = serchCookie("ACCESS_TOKEN", request).getValue(); //쿠키에서 확인
-		
-		bankManagement.transferDifosit(token, json);
-		
-
-		return null;
+		/* validation */
+		if(errors.hasErrors()) {
+			for(FieldError error : errors.getFieldErrors()) {			
+				readTransferInfo.put(error.getField().toString(), error.getDefaultMessage().toString());
+				logger.info("##############"+error.getField().toString());
+				logger.info("##############"+error.getDefaultMessage().toString());
+			}
+			readTransferInfo.put("errorCode", "A0001");
+			return readTransferInfo;
+		} else {
+			/* HashMap으로 변환 */
+			param = mapper.convertValue(transferDepositDto, new TypeReference<HashMap<String, Object>>(){});
+			param.put("tran_dtime", sdf.format(dTime)); //현재시간
+			param.put("bank_tran_id",CreateUniqNum()); // 은행 고유ID
+			
+			logger.info(param.toString()+"!!!!!!!!!!");
+			
+			/* 입금이체 */
+			token = serchCookie("ACCESS_TOKEN", request).getValue(); //쿠키에서 토큰 가져오기
+			readTransferInfo = bankManagement.transferDifosit(token, param);
+			logger.info(">>>>>>>>>>>>>>5");
+			
+			return readTransferInfo;
+		}
 	}
 
 	/**
