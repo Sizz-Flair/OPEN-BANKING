@@ -142,7 +142,7 @@ public class BankManagement {
         return invocationBuilder.post(Entity.form(form)); 
 	}
 	
-	private Response connectPost(HashMap jsonObject, String token, String uri) {
+	private Response connectPost(HashMap param, String token, String uri) {
 		Client client = 
 				ClientBuilder
 				.newClient();
@@ -156,7 +156,7 @@ public class BankManagement {
 		
 		return invocationBuilder
 				.header("Authorization", "Bearer "+token)
-				.post(Entity.json(jsonObject));
+				.post(Entity.json(param));
 	}
 	
 	public HashMap<String, String> tokenInss(String code) 
@@ -438,16 +438,16 @@ public class BankManagement {
 		
 		arrayList = (ArrayList<HashMap<String, String>>) readTransferData.get("res_list");
 		
+		/* res_lsit에 id추가 */
 		for(int i=0; i<arrayList.size(); i++) {
 			arrayList.get(i).put("id", Integer.toString(i));
 		}
 		
+		/* 기존 res_list 삭제 */
 		readTransferData.remove("res_list");
+		
+		/* id추가된 res_list 삽입 */
 		readTransferData.put("res_list", arrayList);
-		
-		logger.info(arrayList.toString()+"jjjjjjjjjjjjjjj");
-		logger.info(readTransferData.toString()+"jjjjjjjjjjjjjjj");
-		
 
 		if(response.getStatus() == 200) {
 			try {
@@ -519,6 +519,60 @@ public class BankManagement {
 		
 		return errorMessage;
 	}
+	
+	/**
+	 *<pre>
+	 * Function Description                ( Writer / Date )
+	 * =====================================================
+	 * - 이체결과 조회             			  (김현진/2021. 1. 14.)
+	 * =====================================================
+	 * Edit Description                    ( Writer / Date )
+	 * =====================================================
+	 * -
+	 *</pre>
+	 *
+	 * HashMap<String,String>
+	 * @param param
+	 * @param oobToken
+	 * @param uri
+	 * @return
+	 * @throws Exception
+	 */
+	public HashMap<String, String> readResultInfo(HashMap<String, Object> param, String oobToken, String uri) throws Exception {
+		
+		/* 변수선언 */
+		Response response = null;
+		HashMap<String, String> readResultInfo = null;
+		HashMap<String, String> errorMessage = new HashMap<String, String>();
+		
+		response = connectPost(param, oobToken, uri);	
+		readResultInfo = response.readEntity(HashMap.class);
+		
+		logger.info("readReuslt>>>>>>>>>>>>>>!   "+readResultInfo.toString());
+		
+		/* 조회 확인 */
+		if(response.getStatus() == 200) {
+			try {
+				if(readResultInfo.get("rsp_code").equals("A0000")) {
+					return readResultInfo;
+				} else {
+					/* 조회실패 시 에러메시지 리턴 */
+					errorMessage.put("errorMessage", 
+							checkResponseMessage(readResultInfo.get("rsp_code").toString()));				
+					return errorMessage;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				response.close();
+			}			
+		}
+		
+		errorMessage.put("errorMessage", Integer.toString(response.getStatus()));
+		
+		return errorMessage;
+	}
+	
 
 	public String checkResponseMessage(String param) throws Exception {
 		
