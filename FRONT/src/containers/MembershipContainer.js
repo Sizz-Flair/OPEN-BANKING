@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from "react-redux";
 import * as memberAction from '../store/modules/membership';
 import ApiService from '../ApiService';
-import MembershipComponent from '../component/system/MembershipComponent';
+import MembershipComponent from '../component/system/MemvershipComponent';
 import { bindActionCreators } from 'redux';
 import qs from 'qs';
 
@@ -12,41 +12,27 @@ import serialize from 'form-serialize'
 import Axios from 'axios';
 import * as yup from 'yup'
 import { Form, Formik } from 'formik';
+import { ThemeConsumer } from 'styled-components';
 
 class MembershipContainer extends Component {
+
+    constructor(props) {
+        super(props);
+        this.inputRef = React.createRef()
+    }
 
     handleChange = (e) => {
         const { MemberAction }= this.props;
         MemberAction.changeInput(e.target);
     }
 
-    /* 주소 검색 */
-    handleAddrComplete = (data) => {
-
-        const { MemberAction, addrInfo } = this.props 
-
-        let fullAddress = data.address;
-        let extraAddress = ''; 
-        
-        if (data.addressType === 'R') {
-          if (data.bname !== '') {
-            extraAddress += data.bname;
-          }
-          if (data.buildingName !== '') {
-            extraAddress += (extraAddress !== '' ? `, ${data.buildingName}` : data.buildingName);
-          }
-          fullAddress += (extraAddress !== '' ? ` (${extraAddress})` : '');
-        }
-    
-        console.log(fullAddress);  // e.g. '서울 성동구 왕십리로2길 20 (성수동1가)'
-        MemberAction.addrInfo(fullAddress);
-      }
-      
     handleSubmit = (e) => {
         /* 주석처리 */
         //console.log(e.target.name);
         //const data = serialize(e.target);
         //console.log("++++++++++",data);
+
+        console.log(e,">..............");
 
         const { history } = this.props;   
 
@@ -87,6 +73,7 @@ class MembershipContainer extends Component {
         console.log(data.address);
 
         const { MemberAction } = this.props;
+        this.inputRef.current.focus()
 
         MemberAction.addrInfo(data.address);
     }
@@ -104,7 +91,7 @@ class MembershipContainer extends Component {
 
         return(
             <div>
-                <MembershipComponent 
+                <MembershipComponent
                 memberId={memberId}
                 memberPassword={memberPassword}
                 userName={userName}
@@ -119,6 +106,7 @@ class MembershipContainer extends Component {
                 addressBtn={this.addrBtnClick}
                 addressOpen={addressOpen}
                 addrInfoData={this.handleComplete}
+                testref={this.inputRef}
                 />
                 {/*<PostComponent 
                 addressBtn={this.addrBtnClick}
