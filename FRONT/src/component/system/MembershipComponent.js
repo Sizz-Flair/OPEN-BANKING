@@ -1,186 +1,224 @@
-import React from 'react';
-import * as yup from 'yup'
-import { Formik } from 'formik';
-import './common.css';
+import React, { useEffect, useRef } from 'react';
+import '../system/common.css';
+import { Field, reduxForm } from 'redux-form';
+import PostComponent from './PostComponent';
 import { useTranslation } from 'react-i18next'
-import PostComponent from '../system/PostComponent';
 
-/* 가입정보 정규식 */
-function ValidationSchema() {
-  
-  const { t } = useTranslation()
+/* Validation error 메세지 */
+const required = value => value ? undefined : 'Required';
+const maxLength = max => value =>
+  value && value.length > max ? `max${max}` : undefined
 
-  const validationSchema = yup.object ({
-    memberId: yup.string()
-    .required(t('MSG_INFO_COMMON_001', {n:'ID'}))
-    .min(5,t('MSG_INFO_COMMON_002', {n:"5"}))
-    .max(20, t('MSG_INFO_COMMON_003', {n:"20"}))
-    .matches( /^[a-z0-9+]*$/,t('MSG_INFO_COMMON_004', {n:"영문소문자 숫자만"})),
+const minLength = min => value =>
+    value && value.length < min ? `min${min}` : undefined
 
-    memberPassword: yup.string().required(t('MSG_INFO_COMMON_001', {n:"비밀번호"}))
-    .min(6,t('MSG_INFO_COMMON_002', {n:"6"}))
-    .max(12,t('MSG_INFO_COMMON_003', {n:"12"})),
+const idValid = value =>
+    value && !/^[a-z0-9+]*$/i.test(value) ?
+    'idValid' : undefined
 
-    userName: yup.string().required(t('MSG_INFO_COMMON_001', {n:"이름"}))
-    .min(1,t('MSG_INFO_COMMON_002', {n:"1"}))
-    .max(10,t('MSG_INFO_COMMON_003', {n:"10"})),
+const email = value =>
+    value && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value) ?
+    'email' : undefined
 
-    email: yup.string()
-    .email(t('MSG_INFO_COMMON_005', {n:"이메일"}))
-    .required(t('MSG_INFO_COMMON_001', {n:"비밀번호"}))
-    .min(8,t('MSG_INFO_COMMON_002', {n:"8"}))
-    .max(20,t('MSG_INFO_COMMON_003', {n:"20"})),
+const maxLength32 = maxLength(32);
+const maxLength10 = maxLength(10);
+const minLength8 = minLength(8);
+const minLength2 = minLength(2);
+const minLength1 = minLength(1);
 
-    phoneNum: yup.string(),
-
-
-    addrInfo: yup.string()
-    .required(t('MSG_INFO_COMMON_001', {n:"주소"}))
-  });
-  return validationSchema;
-}
-
-const MembershipComponent = ({
-    memberId,
-    memberPassword,
-    userName,
-    email,
-    phoneNum,
-    addrInfo,
-    onSubmit,
-    onchange,
+const RenderInput = ({
+    input,
+    placeholder,
+    errorMessage,
+    button,
+    label,
+    type,
+    infoMessage,
     onClick,
-    submitCheck,
+    errorId,
+    meta:{ touched, error }
+}) => {
+
+    const { t } = useTranslation();
+
+    switch(error) {
+        /* ID */
+        case 'Required': errorMessage = t('MSG_INFO_COMMON_001', {n:errorId}); break
+        case 'idValid': errorMessage = t('MSG_INFO_COMMON_004', {n:"영문소문자 숫자만"}); break
+        case 'min5': errorMessage = t('MSG_INFO_COMMON_002', {n:'1'}); break
+        case 'min8': errorMessage = t('MSG_INFO_COMMON_002', {n:'8'}); break
+        case 'min2': errorMessage = t('MSG_INFO_COMMON_002', {n:'2'}); break
+        case 'max10': errorMessage = t('MSG_INFO_COMMON_003', {n:"10"}); break
+        case 'max32': errorMessage = t('MSG_INFO_COMMON_003', {n:"36"}); break  
+    }
+    return(
+        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+            {label != null &&
+                <div className="col-xs-10 col-sm-10 col-md-10 col-lg-10 col-xl-10 d-inline-flex label-box">
+                    <b className="label">{label}</b>
+                </div>
+            }
+            <div className="col-xs-10 col-sm-10 col-md-10 col-lg-10 col-xl-10 d-inline-flex text-center">
+                <input className="border-line-none" {...input} placeholder={placeholder} type={type}/>
+                {button && <button className="btn btn-primary col-3" type="button" onClick={onClick}><b className="btn-b">중복확인</b></button>}
+            </div>
+            {touched && (error && <div className="col-10 mt-3 input-feedback mt-0 d-inline-flex">{errorMessage}</div>)}  
+            {infoMessage != null &&
+                <div className="col-xs-10 col-sm-10 col-md-10 col-lg-10 col-xl-10 d-inline-flex text-center">
+                    <div className="">
+                        <b className="info">{infoMessage}</b>
+                    </div>
+                </div>
+            }
+        </div>
+    )
+}
+const RenderInputAddr = ({
+    input,
+    placeholder,
+    errorMessage,
+    label,
+    addrInfo,
     addressBtn,
     addressOpen,
     addrInfoData,
-}) => (      
-<Formik 
-  validationSchema={ValidationSchema()} //Formik validation
-  onSubmit={(values, { setSubmitting }) => {
-    setTimeout(() => {
-      console.log("Logging in", values);
-      onSubmit(values);
-      setSubmitting(false);
-    }, 500);
-  }}
-  initialValues={{
-    memberId,
-    memberPassword,
-    userName,
-    email,
-    phoneNum,
-    addrInfo
-  }}
->
-  {props => {
-    const {
-      values,
-      handleChange,
-      handleBlur,
-      isSubmitting,
-      isValidating,
-      handleSubmit,
-      touched,
-      errors,
-    } = props;   
+    testref,
+    meta:{ touched, error }
+}) => {
+    const { t } = useTranslation();
+    switch(error) { 
+        /* ID */
+        case 'Required': errorMessage = t('MSG_INFO_COMMON_001', {n:'주소'}); break
+        case 'email': errorMessage = t('MSG_INFO_COMMON_005', {n:"email"}); break
+        case 'min8': errorMessage = t('MSG_INFO_COMMON_002', {n:'8'}); break
+        case 'max32': errorMessage = t('MSG_INFO_COMMON_003', {n:"36"}); break  
+    }
+    return(
+        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+            {label != null &&
+                <div className="col-xs-10 col-sm-10 col-md-10 col-lg-10 col-xl-10 d-inline-flex label-box">
+                    <b className="label">{label}</b>
+                </div>
+            }
+            <div className="col-xs-10 col-sm-10 col-md-10 col-lg-10 col-xl-10 d-inline-flex text-center">
+                <input className="border-line-none" {...input} placeholder={placeholder} value={addrInfo} ref={testref}/>
+                <PostComponent
+                addressBtn={addressBtn} 
+                addressOpen={addressOpen}
+                addrInfo={addrInfoData}
+                /> 
+            </div>
+            {touched && (error && <div className="col-10 mt-3 input-feedback mt-0 d-inline-flex">{errorMessage}</div>)} 
+        </div>
+    )
+}
 
+const MembershipComponent = ({
+    addrInfo,
+    handleSubmit,
+    addressBtn,
+    addressOpen,
+    addrInfoData,
+    testref,
+    onClick,
+}) => {
     return (
-      <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12">  
-        <form className="form" onSubmit={handleSubmit}>
-          <h4><span className="badge badge-light">ID</span></h4>
-          <div className="input-group mb-3">
-            <input 
-            className="col-md-6" 
-            name="memberId" 
-            value={values.memberId} 
-            placeholder="ID" 
-            onChange={handleChange}
-            onBlur={handleBlur}
-            />
-          <button className="btn btn-primary" type="button" onClick={onClick}>중복확인</button>
-          </div>
-          {errors.memberId && touched.memberId && (
-            <div className="input-feedback">{errors.memberId}</div>
-          )}
-          <h4><span className="badge badge-light">PASSWORD</span></h4>
-          <div className="input-group mb-3">
-            <input 
-            className="col-md-6" 
-            name="memberPassword" 
-            value={values.memberPassword} 
-            placeholder="PASSWORD" 
-            type="PASSWORD" 
-            onChange={handleChange} 
-            onBlur={handleBlur}
-            />
-          </div>
-          {errors.memberPassword && touched.memberPassword && (
-            <div className="input-feedback">{errors.memberPassword}</div>
-          )}
-          <h4><span className="badge badge-light">NAME</span></h4>
-          <div className="input-group mb-3">
-           <input 
-           className="col-md-6" 
-           name="userName" 
-           value={values.userName} 
-           placeholder="NAME" 
-           onChange={handleChange} 
-           onBlur={handleBlur}
-           />
-          </div>
-          {errors.userName && touched.userName && (
-            <div className="input-feedback">{errors.userName}</div>
-          )}                   
-          <h4><span className="badge badge-light">E-MAIL</span></h4>
-          <div className="input-group mb-3">
-            <input 
-            name="email" 
-            value={values.email} 
-            placeholder="E-MAIL"  
-            onChange={handleChange} 
-            onBlur={handleBlur}
-            className={errors.email && touched.email && "error"}
-            />
-          </div>
-          {errors.email && touched.email && (
-            <div className="input-feedback">{errors.email}</div>
-          )}
-          <h4><span className="badge badge-light">PHONE NUMBER</span></h4>
-          <div className="input-group mb-3">
-            <input 
-            name="phoneNum" 
-            value={values.phoneNum} 
-            placeholder="POHNE-NUMBER" 
-            onChange={handleChange} 
-            onBlur={handleBlur}
-            />
-          </div>
-          {errors.phoneNum && touched.phoneNum && (
-            <div className="input-feedback">{errors.phoneNum}</div>
-          )}
-          <h4><span className="badge badge-light">ADDRES</span></h4>
-          <div className="input-group mb-3">
-            <input 
-            name="addrInfo" 
-            value={ values.addrInfo = addrInfo } 
-            placeholder="ADDRESS" 
-            onBlur={handleBlur}
-            />
-            <PostComponent
-            addressBtn={addressBtn} 
-            addressOpen={addressOpen}
-            addrInfo={addrInfoData}
-            />
-          </div>
-          {errors.addrInfo && touched.addrInfo && (
-            <div className="input-feedback">{errors.addrInfo}</div>
-          )}
-          <button className="btn btn-primary mr-2" type="submit">가입하기</button>
-        </form>
-    </div>
-    );
-  }}
-  </Formik>
-  );
-export default MembershipComponent;
+        <div className="membership container container-sm container-md container-lg container-xl mt-5 mb-5 text-center">
+            <h1 className="title">OPEN-BANK</h1>
+            <div className="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-xl-6 border d-inline-block">
+                <div className="col-xs-10 col-sm-10 col-md-10 col-lg-10 col-xl-10 d-inline-flex label-box">
+                <h5>오픈뱅크계정 정보를 입력해주세요</h5>
+                </div>
+                <form onSubmit={handleSubmit}>
+                    <Field
+                    name="memberId"
+                    component={RenderInput}
+                    placeholder="아이디 입력"
+                    type=""   
+                    validate={[required, minLength2, idValid, maxLength10]} 
+                    errorId="ID"
+                    errorMessage=""   
+                    label="오픈뱅크 아이디"
+                    button={true}    
+                    onClick={onClick}
+                    infoMessage="* 영문 소문자 또는 숫자 조합만 가능합니다." 
+                    /> 
+                    <Field
+                    name="memberPassword"
+                    component={RenderInput}
+                    placeholder="비밀번호(8~32자리)"
+                    type="password"   
+                    validate={[required, minLength8, maxLength32]} 
+                    label={"비밀번호"}
+                    errorMessage=""     
+                    errorId="비밀번호"   
+                    /> 
+                    <Field
+                    name="reMemberPassword"
+                    component={RenderInput}
+                    placeholder="비밀번호 재입력"
+                    type="password"   
+                    validate={[required, minLength8, maxLength32]} 
+                    errorMessage=""    
+                    errorId="비밀번호"    
+                    /> 
+                    <Field
+                    name="userName"
+                    component={RenderInput}
+                    placeholder="이름"
+                    type=""   
+                    validate={[required, minLength1, maxLength10]} 
+                    label={"이름"}
+                    errorMessage=""    
+                    errorId="이름"    
+                    /> 
+                    <Field
+                    name="phoneNum"
+                    component={RenderInput}
+                    placeholder="전화번호"
+                    type=""   
+                    validate={[required, minLength1, maxLength32]} 
+                    label={"전화번호"}
+                    errorMessage=""    
+                    errorId="전화번호"    
+                    /> 
+                    <Field
+                    name="email"
+                    component={RenderInput}
+                    placeholder="이메일"
+                    type=""   
+                    validate={[email, required]} 
+                    label={"이메일"}
+                    errorMessage="이메일 양식이 아닙니다"     
+                    errorId="이메일"   
+                    />
+                    <Field
+                    name="addrInfo"
+                    component={RenderInputAddr}
+                    placeholder="주소"
+                    type=""   
+                    validate={[required, minLength8, maxLength32]} 
+                    label={"주소"}
+                    errorMessage=""  
+                    post={true}      
+                    addrInfo={addrInfo}
+                    addressBtn={addressBtn}
+                    addressOpen={addressOpen}
+                    addrInfoData={addrInfoData}     
+                    testref={testref}
+                    errorId="주소"
+                    /> 
+                <div className="col-xs-10 col-sm-10 col-md-10 col-lg-10 col-xl-10 d-inline-flex text-center">
+                </div>
+                <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                    <button className="btn btn-primary member-btn">회원가입</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    )
+}
+
+export default reduxForm({
+    form: 'MemberForm'
+})(MembershipComponent)
