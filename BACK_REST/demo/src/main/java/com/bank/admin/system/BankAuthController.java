@@ -62,12 +62,13 @@ public class BankAuthController {
 	BankManagement bankManagement = new BankManagement();
 	
 	@PostMapping(value = "/tokenRequest")
-	public void authCodeRequest(@RequestParam String code, HttpServletResponse res)
+	public ResponseEntity<JSONObject> authCodeRequest(@RequestParam String code, HttpServletResponse res)
 			throws Exception {
 		
 		/* 사용자 인증으로 코드를 받아와서 */
 		HashMap<String, String> bankInfo = new HashMap<String, String>();
 		HashMap<String, String> tokenInfo = null;
+		JSONObject tokenState = new JSONObject();
 		String oobToken = null;
 		
 		bankInfo.put("SCOPE", "inquiry login transfer");
@@ -81,27 +82,44 @@ public class BankAuthController {
 		oobToken = bankManagement.oobToken().get("access_token");
 		
 		/* Test를 위한 토큰 하드코딩 */
-		Cookie token = new Cookie("ACCESS_TOKEN", tokenInfo.get("access_token"));
-		Cookie refreshToken = new Cookie("REFRESH_TOKEN", tokenInfo.get("refresh_token"));
-		Cookie userSeqNum = new Cookie("USER_SEQ_NO", tokenInfo.get("user_seq_no"));
-		Cookie oonToken = new Cookie("OOB_TOKEN", oobToken);
+		if(tokenInfo.get("access_token") != null) {
+			Cookie token = new Cookie("ACCESS_TOKEN", tokenInfo.get("access_token"));
+			Cookie refreshToken = new Cookie("REFRESH_TOKEN", tokenInfo.get("refresh_token"));
+			Cookie userSeqNum = new Cookie("USER_SEQ_NO", tokenInfo.get("user_seq_no"));
+			Cookie oonToken = new Cookie("OOB_TOKEN", oobToken);
 
-		token.setPath("/");
-		token.setMaxAge(7 * 24 * 60 * 60);
+			token.setPath("/");
+			token.setMaxAge(7 * 24 * 60 * 60);
 
-		refreshToken.setPath("/");
-		refreshToken.setMaxAge(7 * 24 * 60 * 60);
+			refreshToken.setPath("/");
+			refreshToken.setMaxAge(7 * 24 * 60 * 60);
 
-		userSeqNum.setPath("/");
-		userSeqNum.setMaxAge(7 * 24 * 60 * 60);
+			userSeqNum.setPath("/");
+			userSeqNum.setMaxAge(7 * 24 * 60 * 60);
+			
+			oonToken.setPath("/");
+			oonToken.setMaxAge(7 * 24 * 60 * 60);
+
+			res.addCookie(token);
+			res.addCookie(refreshToken);
+			res.addCookie(userSeqNum);
+			res.addCookie(oonToken);
+			
+			tokenState.put("tokneSave", true);
+			return ResponseEntity.ok(tokenState);
+		}
+		tokenState.put("tokneSave", false);
+		return ResponseEntity.ok(tokenState);
+	}
+	
+	@PostMapping(value = "/removetoken")
+	public void removeAuthCookies(HttpServletResponse res) throws Exception {
+		logger.info("######################removetoken");
+		Cookie cookie = new Cookie("ACCESS_TOKEN", null);
 		
-		oonToken.setPath("/");
-		oonToken.setMaxAge(7 * 24 * 60 * 60);
-
-		res.addCookie(token);
-		res.addCookie(refreshToken);
-		res.addCookie(userSeqNum);
-		res.addCookie(oonToken);
+		cookie.setMaxAge(0);
+		
+		res.addCookie(cookie);
 	}
 
 	/**

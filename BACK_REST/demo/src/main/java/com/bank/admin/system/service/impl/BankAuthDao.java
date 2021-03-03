@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BankAuthDao {
 	
-	HashMap<String, String> readBankAuthInfo() throws Exception;
+	HashMap<String, String> readBankAuthInfo(HashMap<String, String> param) throws Exception;
 }

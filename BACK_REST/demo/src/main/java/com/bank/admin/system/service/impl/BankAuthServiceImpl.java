@@ -14,9 +14,8 @@ public class BankAuthServiceImpl implements BankAuthService{
 	private BankAuthDao bankAuthDao;
 	
 	@Override
-	public HashMap<String, String> readBankAuthInfo() throws Exception {
+	public HashMap<String, String> readBankAuthInfo(HashMap<String, String> param) throws Exception {
 
-		return bankAuthDao.readBankAuthInfo();
+		return bankAuthDao.readBankAuthInfo(param);
 	}
-
 }

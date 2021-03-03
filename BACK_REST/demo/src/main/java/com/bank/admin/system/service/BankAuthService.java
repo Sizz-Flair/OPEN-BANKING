@@ -2,6 +2,8 @@ package com.bank.admin.system.service;
 
 import java.util.HashMap;
 
+import org.springframework.stereotype.Service;
+
 public interface BankAuthService {
 	
 	/**
@@ -19,6 +21,6 @@ public interface BankAuthService {
 	 * @return
 	 * @throws Exception
 	 */
-	HashMap<String, String> readBankAuthInfo() throws Exception;
+	HashMap<String, String> readBankAuthInfo(HashMap<String, String> param) throws Exception;
 
 }
