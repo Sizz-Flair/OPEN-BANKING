@@ -1,83 +1,355 @@
 .App {
-    font-family: sans-serif;
-  }
-  
-  h1 {
-    text-align: center;
-  }
-  
-  .form {
-    max-width: 500px;
-    width: 100%;
-    margin: 0 auto;
-  }
-  
-  label,
+  font-family: sans-serif;
+}
 
-  .header {
-    position: relative;
-    width: 100%;
-    height: 50px;
-  }
-  .header-top {
-    position: fixed;
-    background-color: blue;
-    width: 100%;
-    height: 50px;
-    z-index: 1;
-  }
-  input {
-    display: block;
-    width: 100%;
-  }
-  
-  label {
-    margin-bottom: 5px;
-    height: 22px;
-  }
-  
-  input {
-    margin-bottom: 20px;
-    padding: 10px;
-    border-radius: 3px;
-    border: 1px solid #777;
-  }
-  
-  input.error {
-    border-color: red;
-  }
-  
-  .input-feedback {
-    color: rgb(235, 54, 54);
-    margin-top: -15px;
-    font-size: 14px;
-    margin-bottom: 20px;
-  }
-  
-  button {
-    padding: 10px 15px;
-    background-color: rgb(70, 153, 179);
-    color: white;
-    border: 1px solid rgb(70, 153, 179);
-    background-color: 250ms;
-  }
-  
-  button:hover {
-    cursor: pointer;
-    background-color: white;
-    color: rgb(70, 153, 179);
-  }
-  
-  .navMenu{
-    color: black;
+h1 {
+  text-align: center;
+}
 
-  }
-  .navMenu:hover{
-    color: black
+.form {
+  max-width: 500px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.header {
+  position: relative;
+  width: 100%;
+  height: 50px;
+}
+
+.header-top {
+  position: fixed;
+  background-color: #f7f7f7dd;
+  width: 100%;
+  height: 50px;
+  z-index: 1;
+}
+.header-inline {
+  text-align: end;
+  margin-left: 30px;
+  margin-right: 30px;
+}
+.header-gourp {
+  list-style: none;
+  display: inline-flex;
+  margin: 0;
+  height: 50px;
+}
+.header-menu {
+  padding: 10px;
+  font-size: 13px;
+  color:#a6a6a6;
+}
+
+input {
+  display: block;
+  width: 100%;
+}
+
+label {
+  margin-bottom: 5px;
+  height: 22px;
+}
+
+input {
+  margin-bottom: 20px;
+  padding: 10px;
+  border-radius: 3px;
+  border: 1px solid #777;
+}
+
+input.error {
+  border-color: red;
+}
+
+.input-feedback {
+  color: rgb(235, 54, 54);
+  margin-top: -15px;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+button {
+  padding: 10px 15px;
+  background-color: rgb(70, 153, 179);
+  color: white;
+  border: 1px solid rgb(70, 153, 179);
+  background-color: 250ms;
+}
+
+button:hover {
+  cursor: pointer;
+  background-color: white;
+  color: rgb(70, 153, 179);
+}
+
+
+@media ( max-width : 420px) {
+  .menu-open:hover {
+  animation-name: menu-open;
+  animation-duration:0.7s;
+  animation-fill-mode: both;
+  background-color: aqua;
   }
 
-  .contentbody {
-    border: solid 0.5px #efe0e0;
-    border-radius: 10px;
-    margin: 10px;
+  .menu-off:hover {
+  animation-name: menu-off;
+  animation-duration:0.7s;
+  animation-fill-mode: both;
+  background-color: bisque;
   }
+}
+
+@keyframes menu-open {
+  0% {
+    height: 0px;
+  }
+  100% {
+    height: 200px;
+  }
+}
+
+@keyframes menu-off {
+  0% {
+    height: 200px;
+  }
+  100% {
+    height: 0px;
+  }
+}
+
+.navcontainer {
+  overflow: hidden;
+}
+
+
+
+@media ( min-width : 576px) {.navcontainer {height: 200px;}}
+@media ( min-width : 768px) {.navcontainer {height: 10px;}}
+@media ( min-width : 992px) {.navcontainer {height: 100%;}}
+@media ( min-width : 1200px) {.navcontainer {height: 100%;}}
+
+.nav-border {
+  border: 0.5px solid;
+}
+.navMenu{
+  color: black;
+  display: inline-flex;
+}
+
+.navMenu:hover{
+  color: rgba(181, 224, 253, 0.867)
+}
+
+.contenthead {
+  border-bottom: 0.5px solid #dddd;
+}
+
+.contentbody {
+  border: solid 0.5px #efe0e0;
+  border-radius: 10px;
+  margin: 10px;
+}
+
+.contentinner {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
+}
+
+.contentfoot {
+  border-top: 0.5px solid #dddd;
+  text-align: end;
+}
+
+.contentbody .text-initial {
+  text-align: initial;
+}
+
+.Transfer .layout {
+  position: relative;
+  width: 50%;
+}
+
+.button-position-end {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.button-border {
+  border: 0.5px solid #dddd;
+  border-radius: 5px;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+}
+
+.button-border:hover {
+  background-color: rgba(221, 221, 221, 0.952);
+}
+
+.d-grid {
+  display: grid;
+}
+
+.n-button {
+  color : #FFFFFF;
+  background-color: #1EC800;
+  border : 1px solid #1EC800;
+  font-family: Bold;
+}
+
+.content-title {
+  font-size: 30px;
+  margin-top: 3rem;
+  margin-bottom: 3rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #dddd;
+}
+
+
+@font-face {
+  font-family: "Bold";
+  src: url('../../font/NanumBarunGothicBold.ttf');
+}
+/*==================POST================*/
+.post-out {
+  position: absolute;
+  display: block;
+  z-index: 1;
+  right: 0%;
+}
+@media ( min-width : 320px) {.post-out {width: 160px;}}
+@media ( min-width : 360px) {.post-out {width: 260px;}}
+@media ( min-width : 400px) {.post-out {width: 320px;}}
+@media ( min-width : 576px) {.post-out {width: 260px;}}
+@media ( min-width : 768px) {.post-out {width: 400px;}}
+@media ( min-width : 992px) {.post-out {width: 400px;}}
+@media ( min-width : 1200px) {.post-out {width: 400px;}}
+/*==================TITLE================*/
+.title {
+  margin: 30px;
+  font-size: 35px;
+  font-family: Bold;
+}
+/*==================MEMBERSHIP================*/
+.membership input {
+  padding-left: 0px;
+  border-color: #ccc;
+}
+.membership input:focus {
+  outline:none;
+}
+.membership .border-line-none {
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-radius: 0px;
+}
+.membership .label-box {
+  margin: 4rem 0rem 0rem 0rem;
+}
+.membership .label {
+  font-size: 12px;
+}
+.membership .info {
+  font-size: 10px;
+  color: rgba(150, 150, 150, 0.603);
+}
+
+.membership .member-btn {
+  width: 100%;
+  margin: 2rem 0rem 2rem 0rem;
+}
+.membership .btn-b {
+  font-size: 12px;
+}
+/*==================USERINFO================*/
+.userinfo input {
+  font-size: 12px;
+    height: 100%;
+}
+.userinfo span {
+  font-size: 12px;
+}
+.userinfo b {
+  font-size: 12px;
+}
+.userinfo .title {
+  margin-left: 30px;
+  border-bottom: 1px solid #dddd;
+}
+.userinfo .table-set {
+  text-align: center;
+  font-size: 12px;
+  overflow: overlay;
+  display: initial;
+}
+.table .th-set {
+  padding: .25rem;
+
+}
+.input-box {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+/*==================ACCOUNT================*/
+.account .input-box {
+  display: flex;
+  border-bottom: 1px solid #dddd;
+  padding: 1rem;
+}
+.account .font-set {
+  font-size: 12px;
+}
+html, body {
+  height: 100%;
+}
+.drop-set {
+  position: relative;
+  width: 100%;
+  right: -25%;
+}
+.drop-size {
+  overflow: auto;
+  height: 200px;
+  width: 100%;
+}
+
+@media ( min-width : 320px) {.account .font-set {font-size: 12px;}}
+@media ( min-width : 360px) {.account .font-set {font-size: 12px;}}
+@media ( min-width : 400px) {.account .font-set {font-size: 12px;}}
+@media ( min-width : 576px) {.account .font-set {font-size: 14px;}}
+@media ( min-width : 768px) {.account .font-set {font-size: 14px;}}
+@media ( min-width : 992px) {.account .font-set {font-size: 14px;}}
+@media ( min-width : 1200px) {.account .font-set {font-size: 14px;}}
+
+/* = */
+.trans .drop-size {
+  overflow: auto;
+  height: 300px;
+}
+
+.trans .content-b{
+  width: 20%;
+  display: inline-block;
+  font-size: 15px;
+}
+
+.trans .content-result {
+  width: 80%;
+  display: inline-block;
+  text-align: end;
+}
+
+.trans .b-sty-1 {
+  color: red;
+  font-size: 25px;
+}
+
+.trans .b-sty-2 {
+  color: #d0c9c9;
+}
