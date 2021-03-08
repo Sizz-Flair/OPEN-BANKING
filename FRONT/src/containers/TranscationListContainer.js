@@ -6,9 +6,30 @@ import * as transcationAction from '../store/modules/transcation';
 import ApiService from '../ApiService';
 
 class TransationListContainer extends Component {
+    componentDidMount() {
+        const { history, TranscationAction } = this.props;
+        ApiService.loginSessionCheck(history).then(res=>{
+            if(res === "SESSION_OUT") {
+                alert("SESSION OUT");
+                history.push("/login");
+            }
+        })
+        
+        //window.addEventListener('resize',()=>console.log(window.innerWidth));
+    }
+
+    UNSAFE_componentWillMount() {
+        const { TranscationAction } = this.props;
+        ApiService.readUserInfoList().then(res=>{
+            TranscationAction.readFintechInfo(res)
+        })
+    }
 
     constructor(props) {
         super(props)
+        this.state = {
+            innerWidth:0
+        };
     }
 
     dropDownOpen = () => {
@@ -43,7 +64,8 @@ class TransationListContainer extends Component {
             accountBankName,
             accountType,
             inquiry_type,
-            transInfoList
+            transInfoList,
+            fintechInfo
          } = this.props
 
         return (
@@ -59,6 +81,7 @@ class TransationListContainer extends Component {
                 inquiry_type={inquiry_type}
                 accountBankName={accountBankName}
                 transInfoList={transInfoList}
+                fintechInfo={fintechInfo}
                 />
             </div>
         )
@@ -70,8 +93,8 @@ const mapStateToProps = ({ transcation }) => ({
     accountInquiryType: transcation.accountInquiryType,
     accountType:transcation.accountType,
     accountBankName:transcation.accountBankName,
-    transInfoList: transcation.transInfoList
-
+    transInfoList: transcation.transInfoList,
+    fintechInfo: transcation.fintechInfo
 });
 const mapDispatchToProps = dispatch => ({
     TranscationAction: bindActionCreators(transcationAction, dispatch)

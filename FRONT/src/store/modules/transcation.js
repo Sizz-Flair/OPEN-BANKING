@@ -1,8 +1,9 @@
-import { handleAction, handleActions } from 'redux-actions';
+import { handleActions } from 'redux-actions';
 
 const DROP_STATE = "transcation/DROP_STATE";
 const SELECT_TYPE = "transcation/SELECT_TYPE";
 const READ_TRANSINFO = "transcation/READ_TRANSINFO";
+const READ_FINTECHINFO = "transcation/READ_FINTECHINFO";
 
 export const dropDownState = text => ({
     type: DROP_STATE,
@@ -19,11 +20,17 @@ export const readTransInfo = text => ({
     payload: text
 })
 
+export const readFintechInfo = text => ({
+    type: READ_FINTECHINFO,
+    payload: text
+});
+
 const iniialState = {
     dropDownState: false,
     accountInquiryType: '조회 종류',
     accountBankName: '은행 이름',
     transInfoList:[],
+    fintechInfo:[],
     accountType: [
         {
             id: 1,
@@ -53,10 +60,14 @@ export default handleActions(
             ...state,
             [action.payload.name]: [action.payload.value],
         }),
-        [READ_TRANSINFO]: (state, action) => (console.log(action.payload.res_list,"+11111"),{
+        [READ_TRANSINFO]: (state, action) => ({
             ...state,
             transInfoList: action.payload.res_list
-        })
+        }),
+        [READ_FINTECHINFO]: (state, action) => ({
+            ...state,
+            fintechInfo: action.payload.res_list
+        }),
     },
     iniialState
 );

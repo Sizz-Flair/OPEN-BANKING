@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react'
+import React, {useState, useRef, useEffect} from 'react'
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css"
 import { useTranslation } from 'react-i18next'
@@ -6,6 +6,7 @@ import { Field, reduxForm } from 'redux-form';
 import * as dateFns from "date-fns";
 import { useSelector } from 'react-redux';
 import Table from '../system/PagingComponent2'
+import MobileTable from '../system/MbileTableComponent'
 import '../system/datePicker.css';
 import '../system/common.css';
 
@@ -24,23 +25,25 @@ const DropDownMenu = ({
     value,
     valueName,
     refFocus,
-    name
+    name,
+    size
 }) => {
     /* 메뉴 드롭다운 상태체크(true/false) */
     let dropDownClassName = 
     dropDownActive 
-    ? "dropdown-menu show p-0" 
-    : "dropdown-menu p-0"
+    ? `dropdown-menu col-12 show ${size}` 
+    : "dropdown-menu col-12"
     return (
+        <div>
         <div 
-        className={dropDownClassName}
+        className={`${dropDownClassName}`}
         onMouseLeave={() => {setDropDownActive_click(true)}}
         onMouseOut={() => {setDropDownActive_click(false)}}
         >
-            {data.map(i => (                
+            {data && data.map(i => (                
                 <button
                 key={i[keyId]}
-                className="dropdown-item p-0 text-center" 
+                className="dropdown-item text-center" 
                 name={name}
                 type="button"
                 value={i[value]}
@@ -49,9 +52,10 @@ const DropDownMenu = ({
                         selectType(e);
                         setDropDownActive(false);}} // 버튼 클릭시 해당 input포커스와 동시에 데이터 변경
                 >
-                    {i[valueName]}
+                    <b>{i[valueName]}</b>
                 </button>
             ))}
+        </div>
         </div>
     )
 }
@@ -89,7 +93,6 @@ const RenderButton = ({
     meta:{ touched, error }
 }) => {
     return (
-
         <div className="col-12">
         <button 
         {...input}            
@@ -134,8 +137,16 @@ const TranscationListComponent = ({
     accountBankName,
     handleSubmit,
     accountType,
-    transInfoList
+    transInfoList,
+    fintechInfo
 }) => {
+    const [windowSize, setWindowSize] = useState();
+
+    useEffect(() => {
+        setWindowSize(window.innerWidth)
+        window.addEventListener('resize', ()=>{setWindowSize(window.innerWidth)});
+
+    }, []);
 
     const createTable = transInfoList.map((i, index) => (
         <TransInfoList
@@ -173,17 +184,19 @@ const TranscationListComponent = ({
     const endDateRef = useRef(null);
     const endDateClickEv = () => endDateRef.current.focus();
 
+    /*  */
     const userFintechNumInfo = useSelector((state)=>state.dashboard);
 
     /* datePicker 한글 적용 */
     return (
-        <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 row">
+        <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 trans">
+            {console.log(fintechInfo)}
             <article className="col-sm-12 col-md-12 col-lg-12 col-xl-12 contentbody">
             <div className="col-12 col-md-12 col-lg-12 col-xl-12 border-bottom mb-3">
                 <h3 className="text-left">거래내역 조회</h3>
             </div>
             <form onSubmit={handleSubmit}>
-            <div className="btn-group dropright col-6 mb-3">
+            <div className="btn-group col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 mb-3">
             <Field
                 name="inquiry_type"
                 component={RenderButton}
@@ -218,7 +231,7 @@ const TranscationListComponent = ({
                 setDropDownActive={setDropDownActive_1}
                 />
             </div>
-            <div className="btn-group dropright col-6 mb-3">
+            <div className="btn-group col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 mb-3">
             <Field
                 name="fintech_use_num"
                 component={RenderButton}
@@ -243,20 +256,21 @@ const TranscationListComponent = ({
                 selectType={selectType}
                 dropDownActive={dropDownActive_2}
                 setDropDownActive_click={setDropDownActive_click}   
-                data={userFintechNumInfo.testInfo}
+                data={fintechInfo}
                 keyId="id"
                 value="fintech_use_num"
                 valueName="bank_name"  
                 name="accountBankName"
                 refFocus={()=>{onClickEvent_2()}} 
-                setDropDownActive={setDropDownActive_2}          
+                setDropDownActive={setDropDownActive_2}      
+                size="drop-size"    
                 />
             </div>
             <div className="row p-3">
-            <div className="col-6 mb-3">        
+            <div className="col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 mb-3">        
                 <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 pb-3 border-bottom">
                     <div className="input-group mb-3">
-                    <span className="input-group-text">시작일자</span>
+                    <span className="col-12 col-sm-2 col-md-2 col-lg-2 col-xl-2 input-group-text">시작일자</span>
                         <DatePicker 
                         selected={startData}
                         dateFormat="yyyy-MM-dd"
@@ -279,10 +293,10 @@ const TranscationListComponent = ({
                     </div>
                 </div> 
             </div>
-            <div className="col-6 mb-3">
+            <div className="col-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 mb-3">
                 <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 pb-3 border-bottom">
                     <div className="input-group mb-3">
-                    <span className="input-group-text">종료일자</span>
+                    <span className="col-12 col-sm-2 col-md-2 col-lg-2 col-xl-2 input-group-text">종료일자</span>
                         <DatePicker 
                         selected={endData}
                         dateFormat="yyyy-MM-dd"
@@ -313,6 +327,13 @@ const TranscationListComponent = ({
             </form>                  
             </article>
             <article className="col-sm-12 col-md-12 col-lg-12 col-xl-12 contentbody">
+                {windowSize < 960 &&
+                <MobileTable 
+                arrayTbody = {transInfoList}
+                />
+
+                }
+                {windowSize < 1930 && windowSize > 960 &&
                 <Table
                 arrayThead = {[                  
                     '거래후 잔액',
@@ -335,8 +356,10 @@ const TranscationListComponent = ({
                     'tran_type'
                 ]}
                 arrayTbody = {transInfoList}
-                />
+            /> }
             </article>
+            {windowSize > 1400 && console.log("1400",windowSize)}
+            {windowSize < 1400 && console.log("1400크다",windowSize)}
             </div>       
     )
 }
