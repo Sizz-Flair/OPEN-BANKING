@@ -11,7 +11,7 @@ class TransationListContainer extends Component {
         ApiService.loginSessionCheck(history).then(res=>{
             if(res === "SESSION_OUT") {
                 alert("SESSION OUT");
-                history.push("/login");
+                history.push("/");
             }
         })
         
@@ -46,6 +46,7 @@ class TransationListContainer extends Component {
     selectType = (e) => {
         const { TranscationAction } = this.props;
         TranscationAction.selectType(e.target)
+        console.log('실행???????????')
     }
 
     /* 잔액조회 */

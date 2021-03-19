@@ -7,7 +7,18 @@ import ApiService from '../ApiService';
 
 class TransferResultContainer extends Component {
 
+    componentDidMount() {
+        const { history } = this.props;
+        ApiService.loginSessionCheck(history).then(res=>{
+            if(res === "SESSION_OUT") {
+                alert("SESSION OUT");
+                history.push("/");
+            }
+        })
+    }
+    
     readResult = (e) => {
+        console.log(e);
         ApiService.readResultInfo(e);
     }
 

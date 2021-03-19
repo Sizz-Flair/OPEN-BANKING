@@ -2,17 +2,9 @@ import React, { Component } from 'react';
 import { connect } from "react-redux";
 import * as memberAction from '../store/modules/membership';
 import ApiService from '../ApiService';
-import MembershipComponent from '../component/system/MemvershipComponent';
+import MembershipComponent from '../component/system/MembershipComponent';
 import { bindActionCreators } from 'redux';
 import qs from 'qs';
-
-
-import PostComponent from '../component/system/PostComponent'
-import serialize from 'form-serialize'
-import Axios from 'axios';
-import * as yup from 'yup'
-import { Form, Formik } from 'formik';
-import { ThemeConsumer } from 'styled-components';
 
 class MembershipContainer extends Component {
 
@@ -27,21 +19,12 @@ class MembershipContainer extends Component {
     }
 
     handleSubmit = (e) => {
-        /* 주석처리 */
-        //console.log(e.target.name);
-        //const data = serialize(e.target);
-        //console.log("++++++++++",data);
-
-        console.log(e,">..............");
-
         const { history } = this.props;   
 
         ApiService.MemberShipInfo(qs.stringify(e), history);
     }
 
     chekDuple = () => {
-        console.log("==========듀플체크==========");
-
         const data = {
             memberId: this.props.memberId
         }
@@ -108,11 +91,6 @@ class MembershipContainer extends Component {
                 addrInfoData={this.handleComplete}
                 testref={this.inputRef}
                 />
-                {/*<PostComponent 
-                addressBtn={this.addrBtnClick}
-                addressOpen={addressOpen}
-                addrInfo={this.handleComplete}
-                />*/}
             </div>
         )
     }

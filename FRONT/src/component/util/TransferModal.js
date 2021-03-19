@@ -13,6 +13,9 @@ const TransferModal = ({
     trnsgerReqInfoResList
 }) => {
 
+    console.log(transferReqInfo);
+    console.log(trnsgerReqInfoResList)
+
     return (
         <div className="col-sm-12 col-md-12 col-lg-4 col-xl-4">
         <TransferModalOverlay visible={visible} />
@@ -28,16 +31,16 @@ const TransferModal = ({
                 </div>
                 <div className="row">
                 <div className="col-sm-12 col-md-12 col-lg-4 col-xl-4">
-                    <label>아이템</label>
-                    <input className="col-12" />
+                    <label>출금기관</label>
+                    <input className="col-12" readOnly value={transferReqInfo.wd_bank_name || ""}/>
                 </div>
                 <div className="col-sm-12 col-md-12 col-lg-4 col-xl-4">
-                    <label>아이템</label>
-                    <input className="col-12" />
+                    <label>송금인</label>
+                    <input className="col-12" readOnly value={transferReqInfo.wd_account_holder_name || ""} />
                 </div>
                 <div className="col-sm-12 col-md-12 col-lg-4 col-xl-4">
-                    <label>아이템</label>
-                    <input className="col-12" />
+                    <label>출금 인자내역</label>
+                    <input className="col-12" readOnly value={transferReqInfo.wd_print_content || ""} />
                 </div>
                 <div className="col-12 mt-3">
                     <Table 

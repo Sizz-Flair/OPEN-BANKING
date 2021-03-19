@@ -4,16 +4,11 @@ import { bindActionCreators } from 'redux';
 import * as loginAction from '../store/modules/login';
 import Login from '../component/system/LoginList';
 import ApiService from '../ApiService';
+import NaverLogin from '../component/system/NaverLoginComponent'
 
 
 
 class LoginContainer extends Component {
-
-    /*handleChange = e => {
-        const { LoginAction } = this.props;
-   
-        LoginAction.changeInput(e.target);
-    };*/
 
     loginSubmit = (formData) => {
         const{ LoginAction } = this.props;
@@ -22,7 +17,7 @@ class LoginContainer extends Component {
         ApiService.RsaKeyModulus(formData, history)
         .then( res=>{
             if(res.resCode === "0000") {
-                history.push('/index')
+                history.push('/index')           
             } else if(res.resCode === "L001" ) {
                 alert('비밀번호가 일치하지 않습니다.');
             } else {
@@ -56,15 +51,16 @@ class LoginContainer extends Component {
     }
 
     render() {
-        const { userId, userPassword, loginSuccess} = this.props;
+        const { userId, userPassword} = this.props;
         return(
-            <div>
+            <div className="container mt-5 text-center">
             <Login 
             userId={userId} 
             userPassword={userPassword}
             onSubmit={this.loginSubmit} 
             movePage={this.handleMovePage}
             />
+            <NaverLogin />
             </div>
         )
     }

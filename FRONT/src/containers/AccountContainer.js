@@ -9,21 +9,22 @@ import * as accountAction from '../store/modules/account';
 
 class AccountContainer extends Component {
 
-    loginSessionCheck = () => {
+    componentDidMount() {
         const { history } = this.props;
-
-        ApiService.loginSessionCheck(history);
+        
+        ApiService.loginSessionCheck(history).then(res=>{
+            if(res === "SESSION_OUT") {
+                alert("SESSION OUT");
+                history.push("/");
+            }
+        })
     }
 
     userInfoList = (data) => {
         console.log("userInfoList")
         const { AccountAction } = this.props;
         ApiService.readUserInfoList().then(res=>{      
-
-            console.log(data+"=======readUserBankIfoList==========");
-
-                AccountAction.userInfo(res);
-            
+                AccountAction.userInfo(res);           
         })
     }
 
@@ -31,6 +32,7 @@ class AccountContainer extends Component {
     readBalanceFintech =(fintechNum) =>{
         const { AccountAction} = this.props;
 
+        console.log(fintechNum,"fiiiiiiiiiiiiiiiiiiii");
         /* fintech_use_num 정보로 잔액 조회 */
         ApiService.readUserAccountInfo(fintechNum).then(res=>{
             AccountAction.selectBankName(res)   
@@ -38,9 +40,6 @@ class AccountContainer extends Component {
     }
 
     render() {
-        {
-            this.loginSessionCheck();
-        }
       const { userBankInfo, renderCheck, selectBankName, fintechNum, selectBankInfo, bank_name } = this.props
         return(
             <div>

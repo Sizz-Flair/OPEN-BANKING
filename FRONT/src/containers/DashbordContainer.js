@@ -10,13 +10,13 @@ import * as dashAction from '../store/modules/dashboard';
 class DashbordContainer extends Component {
 
     componentDidMount() {
-        const { history, DashAction, cookies, authClick } = this.props;
+        const { history, DashAction, cookies } = this.props;
 
         /* SESSION CHECK */
         ApiService.loginSessionCheck(history).then(res=>{
             if(res === "SESSION_OUT") {
                 alert("SESSION_OUT");
-                history.push("/");
+                window.location.href = "http://	52.79.133.139:8080/"; 
             }
         })
 

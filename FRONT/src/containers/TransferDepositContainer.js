@@ -8,6 +8,23 @@ import * as transferAction from '../store/modules/transfer';
 
 class TransferDepositContainer extends Component {
 
+    componentDidMount() {
+        const { history } = this.props;
+        ApiService.loginSessionCheck(history).then(res=>{
+            if(res === "SESSION_OUT") {
+                alert("SESSION OUT");
+                history.push("/");
+            }
+        })
+    }
+
+    UNSAFE_componentWillMount() {
+        const { TransferAction } = this.props;
+        ApiService.readUserInfoList().then(res=>{
+            TransferAction.readFintechInfo(res)
+        })
+    }
+
     transferDeposit = (e) => {
         console.log(e);
         const { TransferAction } = this.props;
@@ -32,7 +49,7 @@ class TransferDepositContainer extends Component {
     }
 
     render() {
-        const {transferReqInfo, trnsgerReqInfoResList, modalVisible}=this.props;
+        const {transferReqInfo, trnsgerReqInfoResList, modalVisible, fintechInfo}=this.props;
         return(
             <div>
                 <TransferDepositComponent 
@@ -41,6 +58,7 @@ class TransferDepositContainer extends Component {
                 trnsgerReqInfoResList={trnsgerReqInfoResList}
                 modalVisible={modalVisible}
                 modalStatus={this.modalStatus}
+                fintechInfo={fintechInfo}
                 />
             </div>
         )
@@ -50,7 +68,8 @@ class TransferDepositContainer extends Component {
 const mapStateToProps = ({ transfer }) => ({
     transferReqInfo: transfer.transferReqInfo,
     trnsgerReqInfoResList: transfer.trnsgerReqInfoResList,
-    modalVisible: transfer.modalVisible
+    modalVisible: transfer.modalVisible,
+    fintechInfo: transfer.fintechInfo
 })
 
 const mapDispatchToProps = dispatch => ({
